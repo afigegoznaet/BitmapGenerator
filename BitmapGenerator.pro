@@ -7,6 +7,7 @@ SOURCES += \
         main.cpp
 
 HEADERS += \
-	BitmapHeaders.hpp
+	BitmapHeaders.hpp \
+	GifHeaders.hpp
 
 INCLUDEPATH += ../range-v3/include

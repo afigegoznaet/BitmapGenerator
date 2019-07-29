@@ -1,3 +1,6 @@
+// taken from:
+// https://github.com/sol-prog/cpp-bmp-images
+
 #ifndef BITMAPHEADERS_HPP
 #define BITMAPHEADERS_HPP
 

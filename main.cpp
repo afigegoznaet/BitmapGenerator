@@ -1,96 +1,100 @@
 #include <algorithm>
 #include <math.h>
 #include "BitmapHeaders.hpp"
+#include "GifHeaders.hpp"
+
+template <typename Func>
+BMP generateFull(int width, int height, int bitsPerPixel, Func &&generator) {
+	BMP bmp(width, height, bitsPerPixel == 4 ? true : false);
+	bmp.data.resize(bitsPerPixel * width * height);
+
+	std::generate(bmp.data.begin(), bmp.data.end(), generator);
+	return bmp;
+}
+
+template <typename GenFunc, typename ModFunc>
+BMP generateLines(int width, int height, int bitsPerPixel, GenFunc &&generator,
+				  ModFunc &&modifier) {
+	BMP bmp(width, height, bitsPerPixel == 4 ? true : false);
+	bmp.data.clear();
+	for (int row = 0; row < height; row++) {
+		std::generate_n(std::back_insert_iterator<decltype(bmp.data)>(bmp.data),
+						bitsPerPixel * width, generator);
+
+		auto beg = bmp.data.begin() + row * bitsPerPixel * width;
+		auto end = bmp.data.end();
+		modifier(beg, end);
+	}
+	return bmp;
+}
 
 
-//#include <range/v3/view.hpp>
-//#include <range/v3/view/generate.hpp>
-//#include <range/v3/action.hpp>
+void writePix() {
 
-int main() {
-
-	auto width = 1000, height = 1000, bitsPerPixel = 3;
-	BMP bmp0(width, height, false);
-	bmp0.data.resize(3 * width * height);
-
-	std::generate(bmp0.data.begin(), bmp0.data.end(),
-				  []() -> unsigned char { return rand() % 255; });
-
+	auto width = 1000, height = 1000, bitsPerPixel = 4;
+	auto generator = []() -> unsigned char { return rand() % 255; };
+	BMP bmp0 = generateFull(width, height, 4, generator);
 	bmp0.write("bmp0.bmp");
 
-
-	BMP bmp1(width, height, false);
-	bmp1.data.clear();
-	for (int row = 0; row < height; row++) {
-		std::generate_n(
-			std::back_insert_iterator<decltype(bmp1.data)>(bmp1.data),
-			bitsPerPixel * width,
-			[]() -> unsigned char { return rand() % 255; });
-
-
-		auto beg = bmp1.data.begin() + row * bitsPerPixel * width;
-		auto end = bmp1.data.end();
-		std::sort(beg, end);
-		std::rotate(beg, beg + rand() % (bitsPerPixel * width), end);
-		// ranges
-		//
-	}
+	BMP bmp1 = generateLines(
+		width, height, 4, generator,
+		[=](const auto &begin, const auto &end) mutable {
+			std::sort(begin, end);
+			std::rotate(begin, begin + rand() % (bitsPerPixel * width), end);
+		});
 	bmp1.write("bmp1.bmp");
 
-	BMP bmp2(width, height, false);
-	bmp2.data.resize(bitsPerPixel * width * height);
 	double n = 0;
 	int i = 0;
-
-	std::generate(bmp2.data.begin(), bmp2.data.end(),
-				  [n, i]() mutable -> unsigned char {
-					  i++;
-					  if (i == 10) {
-						  i = 1;
-						  n += .00011;
-					  }
-					  return 255 * (1 + sin(n * i)) / 2;
-				  });
-
+	BMP bmp2 =
+		generateFull(width, height, 4, [n, i]() mutable -> unsigned char {
+			i++;
+			if (i == 10) {
+				i = 1;
+				n += .00011;
+			}
+			return 255 * (1 + sin(n * i)) / 2;
+		});
 	bmp2.write("bmp2.bmp");
 
-
-	BMP bmp3(width, height, false);
-	bmp3.data.clear();
-	for (int row = 0; row < height; row++) {
-		std::generate_n(
-			std::back_insert_iterator<decltype(bmp3.data)>(bmp3.data),
-			bitsPerPixel * width,
-			[]() -> unsigned char { return rand() % 255; });
-
-
-		auto beg = bmp3.data.begin() + row * bitsPerPixel * width;
-
-		auto nth = beg + rand() % (bitsPerPixel * width);
-		auto end = bmp3.data.end();
-		std::nth_element(beg, nth, end);
-		// std::rotate(beg, beg + rand() % (bitsPerPixel * width), end);
-		// ranges
-		//
-	}
+	BMP bmp3 = generateLines(width, height, 4, generator,
+							 [=](const auto &begin, const auto &end) mutable {
+								 std::sort(begin, end);
+								 auto nth =
+									 begin + rand() % (bitsPerPixel * width);
+								 std::nth_element(begin, nth, end);
+							 });
 	bmp3.write("bmp3.bmp");
 
-	BMP bmp4(width, height, false);
-	bmp4.data.clear();
-	for (int row = 0; row < height; row++) {
-		std::generate_n(
-			std::back_insert_iterator<decltype(bmp4.data)>(bmp4.data),
-			bitsPerPixel * width,
-			[]() -> unsigned char { return rand() % 255; });
 
-
-		auto beg = bmp4.data.begin() + row * bitsPerPixel * width;
-
-		auto nth = beg + rand() % (bitsPerPixel * width);
-		auto end = bmp4.data.end();
-		std::partial_sort(beg, nth, end);
-	}
+	BMP bmp4 = generateLines(width, height, 4, generator,
+							 [=](const auto &begin, const auto &end) mutable {
+								 std::sort(begin, end);
+								 auto nth =
+									 begin + rand() % (bitsPerPixel * width);
+								 std::partial_sort(begin, nth, end);
+							 });
 	bmp4.write("bmp4.bmp");
 
+	std::vector<uint8_t> black(width * height * 4, 0);
+	std::vector<uint8_t> white(width * height * 4, 255);
+
+	auto fileName = "bwgif.gif";
+	int delay = 100;
+	GifWriter g;
+	GifBegin(&g, fileName, width, height, delay);
+	GifWriteFrame(&g, black.data(), width, height, delay);
+	GifWriteFrame(&g, bmp0.data.data(), width, height, delay);
+	GifWriteFrame(&g, bmp1.data.data(), width, height, delay);
+	GifWriteFrame(&g, bmp2.data.data(), width, height, delay);
+	GifWriteFrame(&g, bmp3.data.data(), width, height, delay);
+	GifWriteFrame(&g, bmp4.data.data(), width, height, delay);
+
+
+	GifWriteFrame(&g, white.data(), width, height, delay);
+	GifEnd(&g);
+}
+int main() {
+	writePix();
 	return 0;
 }
