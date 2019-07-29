@@ -89,9 +89,6 @@ int main() {
 		auto nth = beg + rand() % (bitsPerPixel * width);
 		auto end = bmp4.data.end();
 		std::partial_sort(beg, nth, end);
-		// std::rotate(beg, beg + rand() % (bitsPerPixel * width), end);
-		// ranges
-		//
 	}
 	bmp4.write("bmp4.bmp");
 
