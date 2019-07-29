@@ -18,6 +18,7 @@ int main() {
 
 	bmp0.write("bmp0.bmp");
 
+
 	BMP bmp1(width, height, false);
 	bmp1.data.clear();
 	for (int row = 0; row < height; row++) {
@@ -52,6 +53,47 @@ int main() {
 				  });
 
 	bmp2.write("bmp2.bmp");
+
+
+	BMP bmp3(width, height, false);
+	bmp3.data.clear();
+	for (int row = 0; row < height; row++) {
+		std::generate_n(
+			std::back_insert_iterator<decltype(bmp3.data)>(bmp3.data),
+			bitsPerPixel * width,
+			[]() -> unsigned char { return rand() % 255; });
+
+
+		auto beg = bmp3.data.begin() + row * bitsPerPixel * width;
+
+		auto nth = beg + rand() % (bitsPerPixel * width);
+		auto end = bmp3.data.end();
+		std::nth_element(beg, nth, end);
+		// std::rotate(beg, beg + rand() % (bitsPerPixel * width), end);
+		// ranges
+		//
+	}
+	bmp3.write("bmp3.bmp");
+
+	BMP bmp4(width, height, false);
+	bmp4.data.clear();
+	for (int row = 0; row < height; row++) {
+		std::generate_n(
+			std::back_insert_iterator<decltype(bmp4.data)>(bmp4.data),
+			bitsPerPixel * width,
+			[]() -> unsigned char { return rand() % 255; });
+
+
+		auto beg = bmp4.data.begin() + row * bitsPerPixel * width;
+
+		auto nth = beg + rand() % (bitsPerPixel * width);
+		auto end = bmp4.data.end();
+		std::partial_sort(beg, nth, end);
+		// std::rotate(beg, beg + rand() % (bitsPerPixel * width), end);
+		// ranges
+		//
+	}
+	bmp4.write("bmp4.bmp");
 
 	return 0;
 }
