@@ -39,6 +39,11 @@ void writePix(bool saveToGif = true) {
 	BMP bmp0 = generateFull(width, height, bitsPerPixel, generator);
 	bmp0.write("bmp0.bmp");
 
+	BMP bmp111 = generateLines(
+		width, height, 4, generator,
+		[=](const auto &begin, const auto &end) { std::sort(begin, end); });
+	bmp111.write("bmp111.bmp");
+
 	BMP bmp1 = generateLines(
 		width, height, 4, generator, [=](const auto &begin, const auto &end) {
 			std::sort(begin, end);
@@ -51,7 +56,7 @@ void writePix(bool saveToGif = true) {
 								i++;
 								if (i == 10) {
 									i = 1;
-									n += .00011;
+									n += .011;
 								}
 								return uint8_t(255 * (1 + sin(n * i)) / 2);
 							});
@@ -90,6 +95,7 @@ void writePix(bool saveToGif = true) {
 
 	GifWriteFrame(&g, bmp0.data.data(), width, height, delay);
 	GifWriteFrame(&g, bmp1.data.data(), width, height, delay);
+	GifWriteFrame(&g, bmp111.data.data(), width, height, delay);
 	GifWriteFrame(&g, bmp2.data.data(), width, height, delay);
 	GifWriteFrame(&g, bmp3.data.data(), width, height, delay);
 	GifWriteFrame(&g, bmp4.data.data(), width, height, delay);
@@ -98,6 +104,6 @@ void writePix(bool saveToGif = true) {
 	GifEnd(&g);
 }
 int main() {
-	writePix(false);
+	writePix(true);
 	return 0;
 }
