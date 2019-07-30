@@ -21,9 +21,9 @@ struct BMPFileHeader {
 };
 
 struct BMPInfoHeader {
-	uint32_t size{0}; // Size of this header (in bytes)
-	int32_t width{0}; // width of bitmap in pixels
-	int32_t height{
+	uint32_t size{0};  // Size of this header (in bytes)
+	uint32_t width{0}; // width of bitmap in pixels
+	uint32_t height{
 		0}; // width of bitmap in pixels
 			//       (if positive, bottom-up, with origin in lower left corner)
 			//       (if negative, top-down, with origin in upper left corner)
@@ -136,7 +136,7 @@ struct BMP {
 		}
 	}
 
-	BMP(int32_t width, int32_t height, bool has_alpha = true) {
+	BMP(uint32_t width, uint32_t height, bool has_alpha = true) {
 		if (width <= 0 || height <= 0) {
 			throw std::runtime_error(
 				"The image width and height must be positive numbers.");
