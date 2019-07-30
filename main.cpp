@@ -44,13 +44,6 @@ void writePix(bool saveToGif = true) {
 		[=](const auto &begin, const auto &end) { std::sort(begin, end); });
 	bmp111.write("bmp111.bmp");
 
-	BMP bmp1 = generateLines(
-		width, height, 4, generator, [=](const auto &begin, const auto &end) {
-			std::sort(begin, end);
-			std::rotate(begin,
-						begin + uint32_t(rand()) % (bitsPerPixel * width), end);
-		});
-	bmp1.write("bmp1.bmp");
 	BMP bmp2 = generateFull(width, height, bitsPerPixel,
 							[n = .0, i = 0]() mutable -> unsigned char {
 								i++;
@@ -61,6 +54,14 @@ void writePix(bool saveToGif = true) {
 								return uint8_t(255 * (1 + sin(n * i)) / 2);
 							});
 	bmp2.write("bmp2.bmp");
+
+	BMP bmp1 = generateLines(
+		width, height, 4, generator, [=](const auto &begin, const auto &end) {
+			std::sort(begin, end);
+			std::rotate(begin,
+						begin + uint32_t(rand()) % (bitsPerPixel * width), end);
+		});
+	bmp1.write("bmp1.bmp");
 
 	BMP bmp3 =
 		generateLines(width, height, bitsPerPixel, generator,
