@@ -27,8 +27,5 @@
     <ClInclude Include="BitmapHeaders.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GifHeaders.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
