@@ -54,6 +54,27 @@ void writePix() {
 								return uint8_t(255 * (1 + sin(n * i)) / 2);
 							});
 	bmp2.write("bmp2.bmp");
+
+
+	BMP bmp3 = generateLines(
+		width, height, 3, generator, [=](const auto &begin, const auto &end) {
+			std::nth_element(begin, begin + (rand() % 1000), end);
+		});
+	bmp3.write("bmp3.bmp");
+
+	BMP bmp4 = generateLines(
+		width, height, 3, generator, [=](const auto &begin, const auto &end) {
+			std::nth_element(begin, begin + (rand() % 1000), end);
+			std::rotate(begin, begin + (rand() % 500), end);
+		});
+	bmp4.write("bmp4.bmp");
+
+	BMP bmp5 = generateLines(
+		width, height, 3, generator, [=](const auto &begin, const auto &end) {
+			std::sort(begin, end);
+			std::rotate(begin, begin + (rand() % 500), end);
+		});
+	bmp5.write("bmp5.bmp");
 }
 int main() {
 	writePix();
