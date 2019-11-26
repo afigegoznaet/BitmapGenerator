@@ -39,7 +39,7 @@ void writePix() {
 
 
 	BMP bmp1 = generateLines(
-		width, height, 4, generator,
+		width, height, 3, generator,
 		[=](const auto &begin, const auto &end) { std::sort(begin, end); });
 	bmp1.write("bmp1.bmp");
 
